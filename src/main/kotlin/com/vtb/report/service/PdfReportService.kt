@@ -1,71 +1,52 @@
 package com.vtb.report.service
 
-import com.itextpdf.html2pdf.HtmlConverter
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Paragraph
 import com.vtb.report.model.CandidateReport
 import org.springframework.stereotype.Service
 import java.io.ByteArrayOutputStream
-import java.time.format.DateTimeFormatter
 
 @Service
 class PdfReportService {
 
     fun generateCandidateReportPdf(report: CandidateReport): ByteArray {
-        val html = generateReportHtml(report)
-        println("Generated HTML length: ${html.length}")
-        return convertHtmlToPdf(html)
-    }
-
-    private fun generateReportHtml(report: CandidateReport): String {
-        val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy")
-        val createdDate = report.createdAt.format(formatter)
-
-        return """
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Candidate Report</title>
-        </head>
-        <body>
-            <h1>Candidate Assessment Report</h1>
-            <p>Candidate ID: ${report.candidateId} | Job ID: ${report.jobId} | Generated: $createdDate</p>
-            
-            <h2>Overall Assessment</h2>
-            <p>Overall Score: ${report.overallScore}</p>
-            <p>Match Score: ${report.overallMatchScore}</p>
-            <p>Technical Skills: ${report.technicalSkillsScore}</p>
-            <p>Communication: ${report.communicationScore}</p>
-            
-            <h2>Detailed Assessment</h2>
-            <p><strong>Technical Details:</strong> ${report.technicalDetails ?: "No technical details provided"}</p>
-            <p><strong>Communication Details:</strong> ${report.communicationDetails ?: "No communication details provided"}</p>
-            <p><strong>Experience Details:</strong> ${report.experienceDetails ?: "No experience details provided"}</p>
-            
-            <h2>Interview Performance</h2>
-            <p>Questions Answered: ${report.questionsAnswered}/${report.totalQuestions}</p>
-            <p>Teamwork Score: ${report.teamworkScore}</p>
-            <p>Leadership Score: ${report.leadershipScore}</p>
-            <p>Adaptability Score: ${report.adaptabilityScore}</p>
-            
-            <h2>Recommendation</h2>
-            <p><strong>Decision:</strong> ${report.recommendationDecision}</p>
-            <p><strong>Confidence:</strong> ${String.format("%.1f", report.recommendationConfidence * 100)}%</p>
-            <p><strong>Reasoning:</strong> ${report.recommendationReasoning ?: "No additional reasoning provided"}</p>
-        </body>
-        </html>
-        """.trimIndent()
-    }
-
-    private fun convertHtmlToPdf(html: String): ByteArray {
         return try {
+            println("Creating PDF for candidate ${report.candidateId}, job ${report.jobId}")
             val outputStream = ByteArrayOutputStream()
-            HtmlConverter.convertToPdf(html, outputStream)
+            val pdfWriter = PdfWriter(outputStream)
+            val pdfDocument = PdfDocument(pdfWriter)
+            val document = Document(pdfDocument)
+            
+            println("PDF document created, adding content...")
+            
+            // Add simple content
+            document.add(Paragraph("Candidate Report"))
+            document.add(Paragraph("Candidate ID: ${report.candidateId}"))
+            document.add(Paragraph("Job ID: ${report.jobId}"))
+            document.add(Paragraph("Overall Score: ${report.overallScore}"))
+            document.add(Paragraph("Generated at: ${java.time.LocalDateTime.now()}"))
+            
+            println("Content added, closing document...")
+            document.close()
+            pdfDocument.close()
+            
             val pdfBytes = outputStream.toByteArray()
-            println("Generated PDF size: ${pdfBytes.size} bytes")
+            println("PDF generated successfully, size: ${pdfBytes.size} bytes")
+            println("PDF starts with: ${pdfBytes.take(10).joinToString(", ")}")
+            
+            // Verify PDF header
+            if (pdfBytes.size > 4) {
+                val header = String(pdfBytes.take(4).toByteArray())
+                println("PDF header: '$header' (should start with '%PDF')")
+            }
+            
             pdfBytes
         } catch (e: Exception) {
-            println("Error converting HTML to PDF: ${e.message}")
+            println("Error creating PDF: ${e.message}")
             e.printStackTrace()
-            throw RuntimeException("Failed to convert HTML to PDF: ${e.message}", e)
+            throw RuntimeException("Failed to create PDF: ${e.message}", e)
         }
     }
 }

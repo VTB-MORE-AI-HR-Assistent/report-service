@@ -4,7 +4,7 @@
 # Tests all endpoints except email functionality
 
 BASE_URL="http://localhost:8085"
-API_BASE="$BASE_URL/api/reports"
+API_BASE="$BASE_URL/api/v1/reports"
 
 # Colors for output
 RED='\033[0;31m'
@@ -94,35 +94,52 @@ sleep 2
 
 # Test 3: Get Candidate Report
 echo -e "\n${BLUE}3. Get Candidate Report${NC}"
-test_endpoint "GET" "$API_BASE/candidate?candidateId=$CANDIDATE_ID&jobId=$JOB_ID" "" "Get Candidate Report by ID"
+test_endpoint "GET" "$API_BASE/candidate?candidateId=$CANDIDATE_ID" "" "Get Candidate Report by ID"
 
 # Test 4: Get Candidate Recommendation
 echo -e "\n${BLUE}4. Get Candidate Recommendation${NC}"
-test_endpoint "GET" "$API_BASE/recommendations?candidateId=$CANDIDATE_ID&jobId=$JOB_ID" "" "Get Candidate Recommendation by ID"
+test_endpoint "GET" "$API_BASE/recommendations?candidateId=$CANDIDATE_ID" "" "Get Candidate Recommendation by ID"
 
-# Test 5: Download PDF Report
-echo -e "\n${BLUE}5. Download PDF Report${NC}"
-echo -e "${YELLOW}Testing: PDF Download${NC}"
-echo "Endpoint: GET $API_BASE/pdf?candidateId=$CANDIDATE_ID&jobId=$JOB_ID"
+# Test 5: Test PDF Generation (Simple)
+echo -e "\n${BLUE}5. Test PDF Generation${NC}"
+echo -e "${YELLOW}Testing: Simple PDF Download${NC}"
+echo "Endpoint: GET $API_BASE/pdf/test"
 
-pdf_response=$(curl -s -w "\n%{http_code}" "$API_BASE/pdf?candidateId=$CANDIDATE_ID&jobId=$JOB_ID")
+test_pdf_response=$(curl -s -w "\n%{http_code}" "$API_BASE/pdf/test")
+test_pdf_http_code=$(echo "$test_pdf_response" | tail -n1)
+
+if [ "$test_pdf_http_code" -ge 200 ] && [ "$test_pdf_http_code" -lt 300 ]; then
+    echo -e "${GREEN}✅ SUCCESS (HTTP $test_pdf_http_code)${NC}"
+    echo "Test PDF downloaded successfully (saved to test_report.pdf)"
+    # Save PDF to file
+    echo "$test_pdf_response" | head -n -1 > "test_report.pdf"
+else
+    echo -e "${RED}❌ FAILED (HTTP $test_pdf_http_code)${NC}"
+fi
+
+# Test 6: Download PDF Report (with data)
+echo -e "\n${BLUE}6. Download PDF Report${NC}"
+echo -e "${YELLOW}Testing: PDF Download with Data${NC}"
+echo "Endpoint: GET $API_BASE/pdf?candidateId=$CANDIDATE_ID"
+
+pdf_response=$(curl -s -w "\n%{http_code}" "$API_BASE/pdf?candidateId=$CANDIDATE_ID")
 pdf_http_code=$(echo "$pdf_response" | tail -n1)
 
 if [ "$pdf_http_code" -ge 200 ] && [ "$pdf_http_code" -lt 300 ]; then
     echo -e "${GREEN}✅ SUCCESS (HTTP $pdf_http_code)${NC}"
-    echo "PDF downloaded successfully (saved to candidate_report_${CANDIDATE_ID}_${JOB_ID}.pdf)"
+    echo "PDF downloaded successfully (saved to candidate_report_${CANDIDATE_ID}.pdf)"
     # Save PDF to file
-    echo "$pdf_response" | head -n -1 > "candidate_report_${CANDIDATE_ID}_${JOB_ID}.pdf"
+    echo "$pdf_response" | head -n -1 > "candidate_report_${CANDIDATE_ID}.pdf"
 else
     echo -e "${RED}❌ FAILED (HTTP $pdf_http_code)${NC}"
 fi
 
-# Test 6: Test with non-existent data
-echo -e "\n${BLUE}6. Test Error Handling${NC}"
-test_endpoint "GET" "$API_BASE/candidate?candidateId=999&jobId=999" "" "Get Non-existent Report (Should return 404)"
+# Test 7: Test with non-existent data
+echo -e "\n${BLUE}7. Test Error Handling${NC}"
+test_endpoint "GET" "$API_BASE/candidate?candidateId=999" "" "Get Non-existent Report (Should return 404)"
 
-# Test 7: Test invalid parameters
-echo -e "\n${BLUE}7. Test Invalid Parameters${NC}"
+# Test 8: Test invalid parameters
+echo -e "\n${BLUE}8. Test Invalid Parameters${NC}"
 test_endpoint "GET" "$API_BASE/candidate" "" "Get Report without parameters (Should return 400)"
 
 # Summary
@@ -130,17 +147,21 @@ echo -e "\n${BLUE}=================================================="
 echo -e "🎯 API Testing Complete!${NC}"
 echo -e "=================================================="
 echo -e "\n${YELLOW}Available Endpoints Tested:${NC}"
-echo "✅ POST /api/reports - Save ML Report"
-echo "✅ GET /api/reports/candidate - Get Candidate Report"
-echo "✅ GET /api/reports/recommendations - Get Candidate Recommendation"
-echo "✅ GET /api/reports/pdf - Download PDF Report"
+echo "✅ POST /api/v1/reports - Save ML Report"
+echo "✅ GET /api/v1/reports/candidate - Get Candidate Report"
+echo "✅ GET /api/v1/reports/recommendations - Get Candidate Recommendation"
+echo "✅ GET /api/v1/reports/pdf - Download PDF Report"
+echo "✅ GET /api/v1/reports/pdf/test - Test PDF Generation"
 echo "✅ GET /actuator/health - Health Check"
 echo -e "\n${YELLOW}Skipped:${NC}"
-echo "⏭️  POST /api/reports/email - Email functionality (requires Resend setup)"
+echo "⏭️  POST /api/v1/reports/email - Email functionality (removed)"
 
 echo -e "\n${BLUE}📋 Test Files Generated:${NC}"
-if [ -f "candidate_report_${CANDIDATE_ID}_${JOB_ID}.pdf" ]; then
-    echo "📄 candidate_report_${CANDIDATE_ID}_${JOB_ID}.pdf"
+if [ -f "test_report.pdf" ]; then
+    echo "📄 test_report.pdf"
+fi
+if [ -f "candidate_report_${CANDIDATE_ID}.pdf" ]; then
+    echo "📄 candidate_report_${CANDIDATE_ID}.pdf"
 fi
 
 echo -e "\n${GREEN}✨ All tests completed!${NC}"

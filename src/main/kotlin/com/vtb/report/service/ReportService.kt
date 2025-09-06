@@ -30,12 +30,12 @@ class ReportService(
     }
 
     @Transactional(readOnly = true)
-    fun getCandidateReport(candidateId: Int, jobId: Int): CandidateReport? {
-        return candidateReportRepository.findByCandidateIdAndJobId(candidateId, jobId).firstOrNull()
+    fun getCandidateReport(candidateId: Int): CandidateReport? {
+        return candidateReportRepository.findByCandidateId(candidateId).firstOrNull()
     }
 
     @Transactional(readOnly = true)
-    fun getCandidateRecommendation(candidateId: Int, jobId: Int): CandidateRecommendation? {
-        return candidateRecommendationRepository.findByCandidateIdAndJobId(candidateId, jobId).firstOrNull()
+    fun getCandidateRecommendation(candidateId: Int): CandidateRecommendation? {
+        return candidateRecommendationRepository.findByCandidateId(candidateId).firstOrNull()
     }
 }
