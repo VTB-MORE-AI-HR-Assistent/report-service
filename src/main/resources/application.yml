@@ -30,21 +30,3 @@ logging:
     # org.springframework.boot.autoconfigure: DEBUG
     # org.springframework.jdbc.datasource: DEBUG
     # com.zaxxer.hikari: DEBUG
-
-resend:
-  api-key: ${RESEND_API_KEY:your-resend-api-key}
-  from-email: ${RESEND_FROM_EMAIL:noreply@hraiassistant.ru}
-
-mail:
-  host: ${RESEND_SMTP_HOST:smtp.resend.com}
-  port: ${RESEND_SMTP_PORT:587}
-  username: ${RESEND_SMTP_USERNAME:resend}
-  password: ${RESEND_API_KEY:eqweq}
-  properties:
-    mail:
-      smtp:
-        auth: true
-        starttls:
-          enable: true
-        ssl:
-          trust: smtp.resend.com
