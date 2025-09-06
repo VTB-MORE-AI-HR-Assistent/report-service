@@ -67,6 +67,9 @@ jobs:
             exit 1
           fi
 
+          echo "Creating directory on server if it doesn't exist..."
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p ${{ secrets.SERVER_PATH }} && ls -la ${{ secrets.SERVER_PATH }}"
+
           echo "Copying Docker image to server..."
           scp ${{ env.SERVICE_NAME }}.tar.gz \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}/${{ env.SERVICE_NAME }}.tar.gz
