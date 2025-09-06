@@ -96,8 +96,8 @@ jobs:
             
             # Debug environment variables
             echo "Checking environment variables..."
-            echo "PG_USERNAME length: ${PG_USERNAME}"
-            echo "PG_PASSWORD length: ${PG_PASSWORD}"
+            echo "PG_USERNAME length: ${{secrets.PG_USERNAME}}"
+            echo "PG_PASSWORD length: ${{secrets.PG_PASSWORD}}"
             
             # Run new container with custom DNS settings
             docker run -d \
