@@ -4,14 +4,18 @@ import com.vtb.report.dto.MLReportDTO
 import com.vtb.report.model.CandidateReport
 import com.vtb.report.model.CandidateRecommendation
 import com.vtb.report.service.ReportService
+import com.vtb.report.service.PdfReportService
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/reports")
 class ReportController(
-    private val reportService: ReportService
+    private val reportService: ReportService,
+    private val pdfReportService: PdfReportService
 ) {
 
     @PostMapping
@@ -50,5 +54,32 @@ class ReportController(
                 ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok(recommendation)
+    }
+
+    @GetMapping("/pdf")
+    fun downloadCandidateReportPdf(
+        @RequestParam candidateId: Int,
+        @RequestParam jobId: Int
+    ): ResponseEntity<ByteArray> {
+        return try {
+            val report = reportService.getCandidateReport(candidateId, jobId)
+                ?: return ResponseEntity.notFound().build()
+
+            val pdfBytes = pdfReportService.generateCandidateReportPdf(report)
+
+            val headers = HttpHeaders()
+            headers.contentType = MediaType.APPLICATION_PDF
+            headers.setContentDispositionFormData("attachment", "candidate_report_${candidateId}_${jobId}.pdf")
+            headers.cacheControl = "no-cache, no-store, must-revalidate"
+            headers.setPragma("no-cache")
+            headers.setExpires(0)
+
+            ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes)
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to generate PDF: ${e.message}".toByteArray())
+        }
     }
 }

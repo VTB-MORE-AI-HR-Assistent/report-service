@@ -44,6 +44,10 @@ dependencies {
 	
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
+    
+    // PDF Generation
+    implementation("com.itextpdf:itext7-core:8.0.2")
+    implementation("com.itextpdf:html2pdf:5.0.4")
 }
 
 kotlin {
