@@ -39,8 +39,17 @@ jobs:
 
       - name: Build Docker image
         run: |
+          echo "Building Docker image..."
           docker build -t ${{ env.SERVICE_NAME }}:${{ env.IMAGE_TAG }} .
+          echo "Docker image built successfully"
+
+          echo "Saving Docker image to tar.gz..."
           docker save ${{ env.SERVICE_NAME }}:${{ env.IMAGE_TAG }} | gzip > ${{ env.SERVICE_NAME }}.tar.gz
+          echo "Docker image saved successfully"
+
+          echo "Checking if tar.gz file exists..."
+          ls -la ${{ env.SERVICE_NAME }}.tar.gz
+          echo "File size: $(du -h ${{ env.SERVICE_NAME }}.tar.gz)"
 
       - name: Setup SSH
         run: |
@@ -51,8 +60,17 @@ jobs:
 
       - name: Copy Docker image to server
         run: |
+          echo "Checking if tar.gz file exists before copying..."
+          if [ ! -f "${{ env.SERVICE_NAME }}.tar.gz" ]; then
+            echo "ERROR: ${{ env.SERVICE_NAME }}.tar.gz file not found!"
+            ls -la
+            exit 1
+          fi
+
+          echo "Copying Docker image to server..."
           scp ${{ env.SERVICE_NAME }}.tar.gz \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}/${{ env.SERVICE_NAME }}.tar.gz
+          echo "Docker image copied successfully"
 
       - name: Deploy to server
         run: |
