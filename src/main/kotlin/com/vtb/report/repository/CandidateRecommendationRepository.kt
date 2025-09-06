@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CandidateRecommendationRepository : JpaRepository<CandidateRecommendation, Long> {
-    fun findByCandidateIdAndJobId(candidateId: Int, jobId: Int): CandidateRecommendation?
+    fun findByCandidateIdAndJobId(candidateId: Int, jobId: Int): List<CandidateRecommendation>
 }
