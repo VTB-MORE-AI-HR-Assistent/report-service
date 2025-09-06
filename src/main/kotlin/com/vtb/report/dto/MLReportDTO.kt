@@ -1,0 +1,33 @@
+package com.vtb.report.dto
+
+data class MLReportDTO(
+    val candidateId: Int,
+    val jobId: Int,
+    val interviewId: Int,
+    val overallScore: Int,
+    val overallMatchScore: Int,
+    val technicalSkillsScore: Int,
+    val confirmedSkills: List<String>,
+    val missingSkills: List<String>,
+    val technicalDetails: String,
+    val communicationScore: Int,
+    val communicationDetails: String,
+    val experienceScore: Int,
+    val relevantProjects: List<String>,
+    val experienceDetails: String,
+    val totalQuestions: Int,
+    val questionsAnswered: Int,
+    val problemSolvingScore: Int,
+    val teamworkScore: Int,
+    val leadershipScore: Int,
+    val adaptabilityScore: Int,
+    val redFlags: List<String>,
+    val strengths: List<String>,
+    val gaps: List<String>,
+    val recommendationDecision: String,
+    val recommendationConfidence: Double,
+    val recommendationReasoning: String,
+    val nextSteps: List<String>,
+    val candidatePositivePoints: List<String>,
+    val candidateImprovementAreas: List<String>
+)
