@@ -1,0 +1,27 @@
+version: "3.3"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: vtb-ai-hr-postgres
+    environment:
+      POSTGRES_DB: reportdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  report-service:
+    build: .
+    container_name: vtb-ai-hr-report
+    ports:
+      - "8085:8085"
+    environment:
+      PG_URL: jdbc:postgresql://postgres:5432/reportdb
+      PG_USERNAME: postgres
+      PG_PASSWORD: postgres
+      RESEND_API_KEY: re_Ub4WYFY1_3tocFDpF6zqEsvPuBJ2EMh22
+      RESEND_FROM_EMAIL: noreply@hraiassistant.ru
+      JWT_SECRET: mySecretKeyForJWTTokenGenerationThisShouldBeVeryLongAndSecure123456789
+    depends_on:
+      - postgres

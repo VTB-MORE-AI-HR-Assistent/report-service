@@ -44,8 +44,6 @@ dependencies {
 	 implementation("software.amazon.awssdk:auth:2.21.29")
     implementation("software.amazon.awssdk:regions:2.21.29")
 	
-    implementation("org.flywaydb:flyway-core")
-    implementation("org.flywaydb:flyway-database-postgresql")
     
     // PDF Generation
     implementation("com.itextpdf:itext7-core:8.0.2")

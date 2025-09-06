@@ -1,12 +1,10 @@
 package com.vtb.report.controller
 
 import com.vtb.report.dto.MLReportDTO
-import com.vtb.report.dto.EmailRequestDTO
 import com.vtb.report.model.CandidateReport
 import com.vtb.report.model.CandidateRecommendation
 import com.vtb.report.service.ReportService
-import com.vtb.report.service.PdfReportService
-import com.vtb.report.service.ResendEmailService
+import com.vtb.report.service.PdfReportService  
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -17,8 +15,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/reports")
 class ReportController(
     private val reportService: ReportService,
-    private val pdfReportService: PdfReportService,
-    private val resendEmailService: ResendEmailService
+    private val pdfReportService: PdfReportService
 ) {
 
     @PostMapping
@@ -83,29 +80,6 @@ class ReportController(
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Failed to generate PDF: ${e.message}".toByteArray())
-        }
-    }
-
-    @PostMapping("/email")
-    fun sendRecommendationEmail(@RequestBody emailRequest: EmailRequestDTO): ResponseEntity<Map<String, Any>> {
-        return try {
-            val recommendation = reportService.getCandidateRecommendation(
-                emailRequest.candidateId, 
-                emailRequest.jobId
-            ) ?: return ResponseEntity.notFound().build()
-
-            resendEmailService.sendRecommendationEmail(emailRequest, recommendation)
-
-            val response = mapOf(
-                "message" to "Recommendation email sent successfully",
-                "recipientEmail" to emailRequest.recipientEmail,
-                "candidateId" to emailRequest.candidateId,
-                "jobId" to emailRequest.jobId
-            )
-            ResponseEntity.ok(response)
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(mapOf("error" to "Failed to send email: ${e.message}"))
         }
     }
 }

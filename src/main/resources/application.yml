@@ -2,24 +2,17 @@ spring:
   application:
     name: report-service
   datasource:
-    url: ${PG_URL:jdbc:postgresql://localhost:5432/aihr}
+    url: ${PG_URL:jdbc:postgresql://postgres:5432/reportdb}
     username: ${PG_USERNAME:postgres}
-    password: ${PG_PASSWORD:lBfTfVC8zzwmUV5XLIJzuJj0VOZhTVTj6F5kx3QnzGmvz1hpkBHj7ptj6FBwGNH6}
+    password: ${PG_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: false
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration
-    validate-on-migrate: false
-    out-of-order: true
 
 server:
   port: 8085
