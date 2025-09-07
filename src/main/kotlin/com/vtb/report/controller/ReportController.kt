@@ -3,8 +3,8 @@ package com.vtb.report.controller
 import com.vtb.report.dto.MLReportDTO
 import com.vtb.report.model.CandidateReport
 import com.vtb.report.model.CandidateRecommendation
+import com.vtb.report.service.PdfService
 import com.vtb.report.service.ReportService
-import com.vtb.report.service.PdfReportService
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/reports")
 class ReportController(
     private val reportService: ReportService,
-    private val pdfReportService: PdfReportService
+    private val pdfService: PdfService
 ) {
 
     @PostMapping
@@ -60,7 +60,7 @@ class ReportController(
     fun downloadTestPdf(): ResponseEntity<Resource> {
         return try {
             println("Starting PDF generation...")
-            val pdfBytes = pdfReportService.generateCandidateReportPdf(
+            val pdfBytes = pdfService.generateCandidateReportPdf(
                 CandidateReport(
                     candidateId = 999,
                     jobId = 999,
@@ -114,7 +114,7 @@ class ReportController(
             val report = reportService.getCandidateReport(candidateId)
                 ?: return ResponseEntity.notFound().build()
 
-            val pdfBytes = pdfReportService.generateCandidateReportPdf(report)
+            val pdfBytes = pdfService.generateCandidateReportPdf(report)
             val resource = ByteArrayResource(pdfBytes)
 
             val headers = HttpHeaders()
@@ -138,7 +138,7 @@ class ReportController(
     @GetMapping("/pdf/debug")
     fun debugPdf(): ResponseEntity<Map<String, Any>> {
         return try {
-            val pdfBytes = pdfReportService.generateCandidateReportPdf(
+            val pdfBytes = pdfService.generateCandidateReportPdf(
                 CandidateReport(
                     candidateId = 999,
                     jobId = 999,
