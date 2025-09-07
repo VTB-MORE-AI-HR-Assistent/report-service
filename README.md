@@ -191,7 +191,7 @@ The service includes comprehensive error handling:
 
 ## Monitoring
 
-The service includes:
+The service includes
 
 - **Health Check**: `/actuator/health`
 - **Structured Logging**: JSON-formatted logs
