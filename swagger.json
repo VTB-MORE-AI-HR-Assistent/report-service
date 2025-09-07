@@ -1,0 +1,875 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "VTB AI HR Report Service API",
+    "description": "API for managing candidate reports, recommendations, and PDF generation in the VTB AI HR system",
+    "version": "1.0.0",
+    "contact": {
+      "name": "VTB AI HR Team",
+      "email": "ai-hr@vtb.ru"
+    }
+  },
+  "tags": [
+    {
+      "name": "Reports",
+      "description": "Operations related to candidate reports"
+    },
+    {
+      "name": "Recommendations",
+      "description": "Operations related to candidate recommendations"
+    },
+    {
+      "name": "PDF Generation",
+      "description": "Operations for generating PDF reports"
+    }
+  ],
+  "paths": {
+    "/api/v1/reports": {
+      "post": {
+        "tags": ["Reports"],
+        "summary": "Save ML Report",
+        "description": "Saves a machine learning generated report for a candidate",
+        "operationId": "saveMLReport",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MLReportDTO"
+              },
+              "example": {
+                "candidateId": 123,
+                "jobId": 456,
+                "interviewId": 789,
+                "overallScore": 85,
+                "overallMatchScore": 90,
+                "technicalSkillsScore": 80,
+                "confirmedSkills": ["Java", "Spring Boot", "Microservices"],
+                "missingSkills": ["Docker", "Kubernetes"],
+                "technicalDetails": "Strong Java skills with Spring Boot experience",
+                "communicationScore": 85,
+                "communicationDetails": "Clear communication during technical discussions",
+                "experienceScore": 75,
+                "relevantProjects": ["E-commerce Platform", "Banking System"],
+                "experienceDetails": "5 years of Java development experience",
+                "totalQuestions": 10,
+                "questionsAnswered": 8,
+                "problemSolvingScore": 85,
+                "teamworkScore": 80,
+                "leadershipScore": 75,
+                "adaptabilityScore": 90,
+                "redFlags": [],
+                "strengths": ["Technical expertise", "Problem solving"],
+                "gaps": ["Cloud technologies"],
+                "recommendationDecision": "HIRE",
+                "recommendationConfidence": 0.85,
+                "recommendationReasoning": "Strong technical skills and cultural fit",
+                "nextSteps": ["Technical interview", "Reference check"],
+                "candidatePositivePoints": ["Enthusiastic", "Quick learner"],
+                "candidateImprovementAreas": ["Cloud experience"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ML Report saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "ML Report saved successfully"
+                    },
+                    "reportId": {
+                      "type": "integer",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "recommendationId": {
+                      "type": "integer",
+                      "format": "int64",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Failed to save ML Report: Database connection error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/candidate": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Get Candidate Report",
+        "description": "Retrieves a candidate report by candidate ID",
+        "operationId": "getCandidateReport",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "query",
+            "required": true,
+            "description": "The ID of the candidate",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidate report retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateReport"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Candidate report not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Candidate report not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/recommendations": {
+      "get": {
+        "tags": ["Recommendations"],
+        "summary": "Get Candidate Recommendation",
+        "description": "Retrieves a candidate recommendation by candidate ID",
+        "operationId": "getCandidateRecommendation",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "query",
+            "required": true,
+            "description": "The ID of the candidate",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidate recommendation retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateRecommendation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Candidate recommendation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Candidate recommendation not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/pdf/test": {
+      "get": {
+        "tags": ["PDF Generation"],
+        "summary": "Download Test PDF",
+        "description": "Generates and downloads a test PDF report with sample data for testing purposes",
+        "operationId": "downloadTestPdf",
+        "responses": {
+          "200": {
+            "description": "Test PDF generated successfully",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Disposition": {
+                "description": "Attachment filename",
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=\"test_report.pdf\""
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error during PDF generation",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Failed to generate PDF: Template processing error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/pdf": {
+      "get": {
+        "tags": ["PDF Generation"],
+        "summary": "Download Candidate Report PDF",
+        "description": "Generates and downloads a PDF report for a specific candidate",
+        "operationId": "downloadCandidateReportPdf",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "query",
+            "required": true,
+            "description": "The ID of the candidate",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "example": 123
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidate PDF report generated successfully",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Disposition": {
+                "description": "Attachment filename",
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=\"candidate_report_123.pdf\""
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Candidate report not found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Candidate report not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error during PDF generation",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Failed to generate PDF: Template processing error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reports/pdf/debug": {
+      "get": {
+        "tags": ["PDF Generation"],
+        "summary": "Debug PDF Generation",
+        "description": "Debug endpoint that returns PDF generation metadata and base64 encoded PDF for troubleshooting",
+        "operationId": "debugPdf",
+        "responses": {
+          "200": {
+            "description": "PDF debug information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pdfSize": {
+                      "type": "integer",
+                      "description": "Size of the generated PDF in bytes",
+                      "example": 245760
+                    },
+                    "first20Bytes": {
+                      "type": "string",
+                      "description": "First 20 bytes of the PDF in decimal format",
+                      "example": "37, 80, 68, 70, 45, 49, 46, 52, 10, 37, 226, 227, 207, 211, 10, 49, 32, 48, 32, 111"
+                    },
+                    "pdfHeader": {
+                      "type": "string",
+                      "description": "PDF header string",
+                      "example": "%PDF"
+                    },
+                    "base64Length": {
+                      "type": "integer",
+                      "description": "Length of base64 encoded PDF",
+                      "example": 327680
+                    },
+                    "base64Start": {
+                      "type": "string",
+                      "description": "First 50 characters of base64 encoded PDF",
+                      "example": "JVBERi0xLjQKJeLjz9MKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKL01lZGlhQm94IFswIDAgNTk1IDg0Ml0KPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovUmVzb3VyY2VzIDw8Ci9Gb250IDw8Ci9GMSA0IDAgUgo+Pgo+PgovQ29udGVudHMgNSAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCj4+CmVuZG9iago1IDAgb2JqCjw8Ci9MZW5ndGggNDQKPj4Kc3RyZWFtCkJUCi9GMSA3MiBUZgoyNTAgNzAwIFRkCihIZWxsbyBXb3JsZCkgVGoKRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYKMDAwMDAwMDAwOSAwMDAwMCBuCjAwMDAwMDAwNTggMDAwMDAgbgowMDAwMDAwMTE1IDAwMDAwIG4KMDAwMDAwMDI2OCAwMDAwMCBuCjAwMDAwMDAzNDcgMDAwMDAgbgp0cmFpbGVyCjw8Ci9TaXplIDYKL1Jvb3QgMSAwIFIKPj4Kc3RhcnR4cmVmCjQ0NQolJUVPRgo="
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error during PDF generation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "PDF generation failed: Template not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MLReportDTO": {
+        "type": "object",
+        "required": [
+          "candidateId",
+          "jobId",
+          "interviewId",
+          "overallScore",
+          "overallMatchScore",
+          "technicalSkillsScore",
+          "communicationScore",
+          "experienceScore",
+          "totalQuestions",
+          "questionsAnswered",
+          "problemSolvingScore",
+          "teamworkScore",
+          "leadershipScore",
+          "adaptabilityScore",
+          "recommendationDecision",
+          "recommendationConfidence"
+        ],
+        "properties": {
+          "candidateId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique identifier for the candidate",
+            "example": 123
+          },
+          "jobId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique identifier for the job position",
+            "example": 456
+          },
+          "interviewId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique identifier for the interview session",
+            "example": 789
+          },
+          "overallScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Overall candidate score (0-100)",
+            "example": 85
+          },
+          "overallMatchScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Overall job match score (0-100)",
+            "example": 90
+          },
+          "technicalSkillsScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Technical skills assessment score (0-100)",
+            "example": 80
+          },
+          "confirmedSkills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of confirmed technical skills",
+            "example": ["Java", "Spring Boot", "Microservices"]
+          },
+          "missingSkills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of missing technical skills",
+            "example": ["Docker", "Kubernetes"]
+          },
+          "technicalDetails": {
+            "type": "string",
+            "description": "Detailed technical assessment notes",
+            "example": "Strong Java skills with Spring Boot experience"
+          },
+          "communicationScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Communication skills score (0-100)",
+            "example": 85
+          },
+          "communicationDetails": {
+            "type": "string",
+            "description": "Detailed communication assessment notes",
+            "example": "Clear communication during technical discussions"
+          },
+          "experienceScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Experience assessment score (0-100)",
+            "example": 75
+          },
+          "relevantProjects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of relevant projects mentioned",
+            "example": ["E-commerce Platform", "Banking System"]
+          },
+          "experienceDetails": {
+            "type": "string",
+            "description": "Detailed experience assessment notes",
+            "example": "5 years of Java development experience"
+          },
+          "totalQuestions": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of interview questions",
+            "example": 10
+          },
+          "questionsAnswered": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of questions answered by candidate",
+            "example": 8
+          },
+          "problemSolvingScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Problem solving skills score (0-100)",
+            "example": 85
+          },
+          "teamworkScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Teamwork skills score (0-100)",
+            "example": 80
+          },
+          "leadershipScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Leadership skills score (0-100)",
+            "example": 75
+          },
+          "adaptabilityScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Adaptability skills score (0-100)",
+            "example": 90
+          },
+          "redFlags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of identified red flags",
+            "example": []
+          },
+          "strengths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of candidate strengths",
+            "example": ["Technical expertise", "Problem solving"]
+          },
+          "gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of identified skill gaps",
+            "example": ["Cloud technologies"]
+          },
+          "recommendationDecision": {
+            "type": "string",
+            "enum": ["HIRE", "NO_HIRE", "MAYBE"],
+            "description": "Final recommendation decision",
+            "example": "HIRE"
+          },
+          "recommendationConfidence": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Confidence level of the recommendation (0.0-1.0)",
+            "example": 0.85
+          },
+          "recommendationReasoning": {
+            "type": "string",
+            "description": "Detailed reasoning for the recommendation",
+            "example": "Strong technical skills and cultural fit"
+          },
+          "nextSteps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Recommended next steps",
+            "example": ["Technical interview", "Reference check"]
+          },
+          "candidatePositivePoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of candidate positive points",
+            "example": ["Enthusiastic", "Quick learner"]
+          },
+          "candidateImprovementAreas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of areas for candidate improvement",
+            "example": ["Cloud experience"]
+          }
+        }
+      },
+      "CandidateReport": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unique identifier for the report",
+            "example": 1
+          },
+          "candidateId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique identifier for the candidate",
+            "example": 123
+          },
+          "jobId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique identifier for the job position",
+            "example": 456
+          },
+          "interviewId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique identifier for the interview session",
+            "example": 789
+          },
+          "overallScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Overall candidate score (0-100)",
+            "example": 85
+          },
+          "overallMatchScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Overall job match score (0-100)",
+            "example": 90
+          },
+          "technicalSkillsScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Technical skills assessment score (0-100)",
+            "example": 80
+          },
+          "confirmedSkills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of confirmed technical skills",
+            "example": ["Java", "Spring Boot", "Microservices"]
+          },
+          "missingSkills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of missing technical skills",
+            "example": ["Docker", "Kubernetes"]
+          },
+          "technicalDetails": {
+            "type": "string",
+            "nullable": true,
+            "description": "Detailed technical assessment notes",
+            "example": "Strong Java skills with Spring Boot experience"
+          },
+          "communicationScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Communication skills score (0-100)",
+            "example": 85
+          },
+          "communicationDetails": {
+            "type": "string",
+            "nullable": true,
+            "description": "Detailed communication assessment notes",
+            "example": "Clear communication during technical discussions"
+          },
+          "experienceScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Experience assessment score (0-100)",
+            "example": 75
+          },
+          "relevantProjects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of relevant projects mentioned",
+            "example": ["E-commerce Platform", "Banking System"]
+          },
+          "experienceDetails": {
+            "type": "string",
+            "nullable": true,
+            "description": "Detailed experience assessment notes",
+            "example": "5 years of Java development experience"
+          },
+          "totalQuestions": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of interview questions",
+            "example": 10
+          },
+          "questionsAnswered": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of questions answered by candidate",
+            "example": 8
+          },
+          "problemSolvingScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Problem solving skills score (0-100)",
+            "example": 85
+          },
+          "teamworkScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Teamwork skills score (0-100)",
+            "example": 80
+          },
+          "leadershipScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Leadership skills score (0-100)",
+            "example": 75
+          },
+          "adaptabilityScore": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Adaptability skills score (0-100)",
+            "example": 90
+          },
+          "redFlags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of identified red flags",
+            "example": []
+          },
+          "strengths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of candidate strengths",
+            "example": ["Technical expertise", "Problem solving"]
+          },
+          "gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of identified skill gaps",
+            "example": ["Cloud technologies"]
+          },
+          "recommendationDecision": {
+            "type": "string",
+            "description": "Final recommendation decision",
+            "example": "HIRE"
+          },
+          "recommendationConfidence": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Confidence level of the recommendation (0.0-1.0)",
+            "example": 0.85
+          },
+          "recommendationReasoning": {
+            "type": "string",
+            "nullable": true,
+            "description": "Detailed reasoning for the recommendation",
+            "example": "Strong technical skills and cultural fit"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Report creation timestamp",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Report last update timestamp",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        }
+      },
+      "CandidateRecommendation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unique identifier for the recommendation",
+            "example": 1
+          },
+          "candidateId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique identifier for the candidate",
+            "example": 123
+          },
+          "jobId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique identifier for the job position",
+            "example": 456
+          },
+          "interviewId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Unique identifier for the interview session",
+            "example": 789
+          },
+          "recommendationDecision": {
+            "type": "string",
+            "description": "Final recommendation decision",
+            "example": "HIRE"
+          },
+          "recommendationConfidence": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Confidence level of the recommendation (0.0-1.0)",
+            "example": 0.85
+          },
+          "recommendationReasoning": {
+            "type": "string",
+            "nullable": true,
+            "description": "Detailed reasoning for the recommendation",
+            "example": "Strong technical skills and cultural fit"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Recommendation creation timestamp",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Recommendation last update timestamp",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        }
+      }
+    }
+  }
+}
