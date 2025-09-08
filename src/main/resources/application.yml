@@ -16,7 +16,7 @@ spring:
     show-sql: false
 
 server:
-  port: 8085
+  port: ${REPORT_SERVICE_PORT:8086}
 
 jwt:
   secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationThisShouldBeVeryLongAndSecure123456789}
