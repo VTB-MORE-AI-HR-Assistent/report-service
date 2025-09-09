@@ -177,4 +177,97 @@ class ReportController(
                 .body(mapOf("error" to (e.message ?: "Unknown error")))
         }
     }
+
+    @GetMapping
+    fun getReports(
+        @RequestParam(required = false) limit: Int?,
+        @RequestParam(required = false) sortBy: String?,
+        @RequestParam(required = false) sortOrder: String?
+    ): ResponseEntity<List<Map<String, Any>>> {
+        // Возвращаем mock данные для reports
+        val mockReports = listOf(
+            mapOf(
+                "id" to 1,
+                "candidateId" to 101,
+                "candidateName" to "Иван Петров",
+                "position" to "Senior Frontend Developer",
+                "overallScore" to 85,
+                "status" to "COMPLETED",
+                "createdAt" to "2025-09-08T10:30:00Z"
+            ),
+            mapOf(
+                "id" to 2,
+                "candidateId" to 102,
+                "candidateName" to "Анна Сидорова", 
+                "position" to "Backend Developer",
+                "overallScore" to 78,
+                "status" to "COMPLETED",
+                "createdAt" to "2025-09-07T15:20:00Z"
+            )
+        )
+        
+        val limitedReports = if (limit != null) mockReports.take(limit) else mockReports
+        return ResponseEntity.ok(limitedReports)
+    }
+}
+
+@RestController
+@RequestMapping("/api/v1/interviews")
+class InterviewController {
+    
+    @GetMapping("/stats")
+    fun getInterviewStats(): ResponseEntity<Map<String, Any>> {
+        val stats = mapOf(
+            "totalInterviews" to 24,
+            "completedInterviews" to 18,
+            "scheduledInterviews" to 6,
+            "averageScore" to 82.5,
+            "passRate" to 0.75,
+            "todayInterviews" to 3,
+            "weekInterviews" to 12
+        )
+        return ResponseEntity.ok(stats)
+    }
+    
+    @GetMapping
+    fun getInterviews(
+        @RequestParam(required = false) dateFrom: String?,
+        @RequestParam(required = false) dateTo: String?,
+        @RequestParam(required = false) sortBy: String?,
+        @RequestParam(required = false) sortOrder: String?
+    ): ResponseEntity<List<Map<String, Any>>> {
+        // Mock данные для интервью
+        val mockInterviews = listOf(
+            mapOf(
+                "id" to 1,
+                "candidateId" to 101,
+                "candidateName" to "Александр Иванов",
+                "position" to "Senior Frontend Developer",
+                "scheduledAt" to "2025-09-09T14:00:00Z",
+                "status" to "SCHEDULED",
+                "interviewer" to "HR Менеджер"
+            ),
+            mapOf(
+                "id" to 2,
+                "candidateId" to 102,
+                "candidateName" to "Мария Петрова",
+                "position" to "Backend Developer", 
+                "scheduledAt" to "2025-09-09T16:30:00Z",
+                "status" to "SCHEDULED",
+                "interviewer" to "Технический лидер"
+            ),
+            mapOf(
+                "id" to 3,
+                "candidateId" to 103,
+                "candidateName" to "Дмитрий Смирнов",
+                "position" to "DevOps Engineer",
+                "scheduledAt" to "2025-09-09T11:00:00Z",
+                "status" to "COMPLETED",
+                "interviewer" to "Senior Engineer",
+                "score" to 88
+            )
+        )
+        
+        return ResponseEntity.ok(mockInterviews)
+    }
 }
